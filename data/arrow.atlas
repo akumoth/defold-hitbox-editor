@@ -1,0 +1,4 @@
+images {
+  image: "/data/arrow.png"
+}
+extrude_borders: 2

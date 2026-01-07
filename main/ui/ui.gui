@@ -1,0 +1,1178 @@
+script: "/main/ui/script/anim.gui_script"
+fonts {
+  name: "druid_text_regular"
+  font: "/druid/fonts/druid_text_regular.font"
+}
+textures {
+  name: "empty"
+  texture: "/data/empty.atlas"
+}
+textures {
+  name: "arrow"
+  texture: "/data/arrow.atlas"
+}
+nodes {
+  position {
+    x: 530.0
+    y: 320.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "sprite_window"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "sprite_view"
+  parent: "sprite_window"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 100.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "hitbox_prefab"
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
+  parent: "sprite_window"
+  inherit_alpha: true
+  alpha: 0.5
+  enabled: false
+}
+nodes {
+  size {
+    x: 104.0
+    y: 104.0
+  }
+  color {
+    x: 0.6
+    y: 0.8
+    z: 0.6
+  }
+  type: TYPE_BOX
+  id: "border"
+  parent: "hitbox_prefab"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 100.0
+    y: 100.0
+  }
+  color {
+    x: 0.8
+    z: 0.8
+  }
+  type: TYPE_BOX
+  id: "fill"
+  parent: "hitbox_prefab"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 75.0
+    y: 625.0
+  }
+  size {
+    x: 150.0
+    y: 30.0
+  }
+  color {
+    x: 0.302
+    y: 0.4
+    z: 0.8
+  }
+  type: TYPE_BOX
+  id: "load_atlas"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_TEXT
+  text: "Load Atlas..."
+  font: "druid_text_regular"
+  id: "atlas_text"
+  parent: "load_atlas"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 230.0
+    y: 625.0
+  }
+  size {
+    x: 150.0
+    y: 30.0
+  }
+  color {
+    x: 0.302
+    y: 0.4
+    z: 0.8
+  }
+  type: TYPE_BOX
+  id: "load_hitbox_data"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_TEXT
+  text: "Load Hitboxes..."
+  font: "druid_text_regular"
+  id: "load_hitbox_data_text"
+  parent: "load_hitbox_data"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 385.0
+    y: 625.0
+  }
+  size {
+    x: 150.0
+    y: 30.0
+  }
+  color {
+    x: 0.302
+    y: 0.4
+    z: 0.8
+  }
+  type: TYPE_BOX
+  id: "save_hitbox_data"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_TEXT
+  text: "Save Hitboxes..."
+  font: "druid_text_regular"
+  id: "save_hitbox_data_text"
+  parent: "save_hitbox_data"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 365.0
+    y: 188.0
+  }
+  size {
+    x: 410.0
+    y: 125.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "frame_idx_view"
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+}
+nodes {
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "frame_idx_content"
+  parent: "frame_idx_view"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: -180.0
+    y: 36.0
+  }
+  size {
+    x: 50.0
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "frame_idx_but"
+  parent: "frame_idx_content"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+  visible: false
+}
+nodes {
+  size {
+    x: 40.0
+    y: 40.0
+  }
+  color {
+    x: 0.502
+    y: 0.6
+  }
+  type: TYPE_BOX
+  id: "frame_idx"
+  parent: "frame_idx_but"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  size {
+    x: 40.0
+    y: 40.0
+  }
+  type: TYPE_TEXT
+  text: "1"
+  font: "druid_text_regular"
+  id: "num"
+  parent: "frame_idx_but"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 80.0
+    y: 250.0
+  }
+  size {
+    x: 160.0
+    y: 250.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "anim_sel_view"
+  pivot: PIVOT_N
+  inherit_alpha: true
+  slice9 {
+    x: 16.0
+    y: 16.0
+    z: 16.0
+    w: 16.0
+  }
+  clipping_mode: CLIPPING_MODE_STENCIL
+}
+nodes {
+  size {
+    x: 160.0
+    y: 250.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_BOX
+  id: "anim_sel_content"
+  pivot: PIVOT_N
+  parent: "anim_sel_view"
+  inherit_alpha: true
+  slice9 {
+    x: 16.0
+    y: 16.0
+    z: 16.0
+    w: 16.0
+  }
+  visible: false
+}
+nodes {
+  position {
+    x: -1.0
+    y: -20.0
+  }
+  size {
+    x: 160.0
+    y: 40.0
+  }
+  color {
+    x: 0.302
+    y: 0.4
+    z: 0.8
+  }
+  type: TYPE_BOX
+  id: "anim_sel_but"
+  adjust_mode: ADJUST_MODE_STRETCH
+  parent: "anim_sel_content"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+  visible: false
+}
+nodes {
+  size {
+    x: 155.0
+    y: 33.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_BOX
+  id: "outline"
+  parent: "anim_sel_but"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  size {
+    x: 150.0
+    y: 30.0
+  }
+  color {
+    x: 0.502
+    y: 0.6
+  }
+  type: TYPE_BOX
+  id: "button"
+  parent: "anim_sel_but"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_TEXT
+  text: "Anim Name"
+  font: "druid_text_regular"
+  id: "name"
+  parent: "anim_sel_but"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 610.0
+    y: 250.0
+  }
+  size {
+    x: 350.0
+    y: 250.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "attr_table"
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+}
+nodes {
+  size {
+    x: 350.0
+    y: 250.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "attr_content"
+  pivot: PIVOT_NW
+  parent: "attr_table"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 350.0
+    y: 40.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "property"
+  pivot: PIVOT_NW
+  parent: "attr_content"
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  position {
+    x: 75.0
+    y: -20.0
+  }
+  size {
+    x: 150.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "property_name"
+  parent: "property"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 145.0
+    y: 35.0
+  }
+  color {
+    x: 0.4
+    y: 0.502
+    z: 0.902
+  }
+  type: TYPE_BOX
+  id: "attr_outline"
+  parent: "property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  size {
+    x: 140.0
+    y: 30.0
+  }
+  color {
+    x: 0.502
+    y: 0.6
+  }
+  type: TYPE_BOX
+  id: "attr_box"
+  parent: "property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 190.0
+    y: 35.0
+  }
+  type: TYPE_TEXT
+  text: "dummy"
+  font: "druid_text_regular"
+  id: "attr_text"
+  parent: "property_name"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 150.0
+    y: -20.0
+  }
+  size {
+    x: 200.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "property_content"
+  pivot: PIVOT_W
+  parent: "property"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 160.0
+    y: 125.0
+  }
+  size {
+    x: 225.0
+    y: 125.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "anim_attr_table"
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+}
+nodes {
+  size {
+    x: 225.0
+    y: 125.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "anim_attr_content"
+  pivot: PIVOT_NW
+  parent: "anim_attr_table"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 225.0
+    y: 40.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "anim_property"
+  pivot: PIVOT_NW
+  parent: "anim_attr_content"
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  position {
+    x: 56.0
+    y: -20.0
+  }
+  size {
+    x: 112.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "anim_property_name"
+  parent: "anim_property"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 105.0
+    y: 35.0
+  }
+  color {
+    x: 0.4
+    y: 0.502
+    z: 0.902
+  }
+  type: TYPE_BOX
+  id: "anim_attr_outline"
+  parent: "anim_property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  size {
+    x: 100.0
+    y: 30.0
+  }
+  color {
+    x: 0.502
+    y: 0.6
+  }
+  type: TYPE_BOX
+  id: "anim_attr_box"
+  parent: "anim_property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 190.0
+    y: 35.0
+  }
+  type: TYPE_TEXT
+  text: "dummy"
+  font: "druid_text_regular"
+  id: "anim_attr_text"
+  parent: "anim_property_name"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 112.0
+    y: -20.0
+  }
+  size {
+    x: 112.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "anim_property_content"
+  pivot: PIVOT_W
+  parent: "anim_property"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 385.0
+    y: 125.0
+  }
+  size {
+    x: 225.0
+    y: 125.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "frame_attr_table"
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+}
+nodes {
+  size {
+    x: 225.0
+    y: 125.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "frame_attr_content"
+  pivot: PIVOT_NW
+  parent: "frame_attr_table"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 225.0
+    y: 40.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "frame_property"
+  pivot: PIVOT_NW
+  parent: "frame_attr_content"
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  position {
+    x: 56.0
+    y: -20.0
+  }
+  size {
+    x: 112.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "frame_property_name"
+  parent: "frame_property"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 105.0
+    y: 35.0
+  }
+  color {
+    x: 0.4
+    y: 0.502
+    z: 0.902
+  }
+  type: TYPE_BOX
+  id: "frame_attr_outline"
+  parent: "frame_property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  size {
+    x: 100.0
+    y: 30.0
+  }
+  color {
+    x: 0.502
+    y: 0.6
+  }
+  type: TYPE_BOX
+  id: "frame_attr_box"
+  parent: "frame_property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 190.0
+    y: 35.0
+  }
+  type: TYPE_TEXT
+  text: "dummy"
+  font: "druid_text_regular"
+  id: "frame_attr_text"
+  parent: "frame_property_name"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 112.0
+    y: -20.0
+  }
+  size {
+    x: 112.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "frame_property_content"
+  pivot: PIVOT_W
+  parent: "frame_property"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    y: 600.0
+  }
+  size {
+    x: 225.0
+    y: 90.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "editor_attr_table"
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+}
+nodes {
+  size {
+    x: 225.0
+    y: 90.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "editor_attr_content"
+  pivot: PIVOT_NW
+  parent: "editor_attr_table"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 225.0
+    y: 40.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "editor_property"
+  pivot: PIVOT_NW
+  parent: "editor_attr_content"
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  position {
+    x: 56.0
+    y: -20.0
+  }
+  size {
+    x: 112.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "editor_property_name"
+  parent: "editor_property"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 105.0
+    y: 35.0
+  }
+  color {
+    x: 0.4
+    y: 0.502
+    z: 0.902
+  }
+  type: TYPE_BOX
+  id: "editor_attr_outline"
+  parent: "editor_property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  size {
+    x: 100.0
+    y: 30.0
+  }
+  color {
+    x: 0.502
+    y: 0.6
+  }
+  type: TYPE_BOX
+  id: "editor_attr_box"
+  parent: "editor_property_name"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 190.0
+    y: 35.0
+  }
+  type: TYPE_TEXT
+  text: "dummy"
+  font: "druid_text_regular"
+  id: "editor_attr_text"
+  parent: "editor_property_name"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 112.0
+    y: -20.0
+  }
+  size {
+    x: 112.0
+    y: 30.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "editor_property_content"
+  pivot: PIVOT_W
+  parent: "editor_property"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 200.0
+    y: 20.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "slider"
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  size {
+    x: 200.0
+    y: 5.0
+  }
+  color {
+    x: 0.2
+    y: 0.302
+    z: 0.702
+  }
+  type: TYPE_BOX
+  id: "slider_back"
+  parent: "slider"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: -85.0
+  }
+  size {
+    x: 30.0
+    y: 30.0
+  }
+  color {
+    x: 0.102
+    y: 0.2
+    z: 0.6
+  }
+  type: TYPE_BOX
+  id: "slider_pin"
+  parent: "slider"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    y: 10.0
+  }
+  size {
+    x: 80.0
+    y: 20.0
+  }
+  color {
+    x: 0.302
+    y: 0.302
+    z: 0.302
+  }
+  type: TYPE_BOX
+  id: "slider_value"
+  parent: "slider"
+  inherit_alpha: true
+}
+nodes {
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  size {
+    x: 80.0
+    y: 20.0
+  }
+  type: TYPE_TEXT
+  font: "druid_text_regular"
+  id: "slider_value_text"
+  parent: "slider_value"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 30.0
+    y: 30.0
+  }
+  color {
+    x: 0.2
+    y: 0.302
+    z: 0.702
+  }
+  type: TYPE_BOX
+  id: "checkbox"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  size {
+    x: 15.0
+    y: 15.0
+  }
+  color {
+    x: 0.0
+    z: 0.0
+  }
+  type: TYPE_BOX
+  id: "checkmark"
+  parent: "checkbox"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  texture: "empty"
+  id: "resize_buttons"
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "n"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "nw"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "w"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "sw"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "s"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "se"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "e"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    z: 1.0
+  }
+  size {
+    x: 8.0
+    y: 8.0
+  }
+  color {
+    x: 0.102
+    y: 0.302
+    z: 0.102
+  }
+  type: TYPE_BOX
+  id: "ne"
+  parent: "resize_buttons"
+  inherit_alpha: true
+}
+nodes {
+  size {
+    x: 100.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  texture: "arrow/arrow"
+  id: "arrow"
+  pivot: PIVOT_S
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  position {
+    y: 10.0
+  }
+  size {
+    x: 180.0
+    y: 30.0
+  }
+  color {
+    x: 0.302
+    y: 0.302
+    z: 0.302
+  }
+  type: TYPE_BOX
+  id: "text_edit"
+  inherit_alpha: true
+  enabled: false
+}
+nodes {
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  size {
+    x: 340.0
+    y: 20.0
+  }
+  type: TYPE_TEXT
+  font: "druid_text_regular"
+  id: "text"
+  parent: "text_edit"
+  inherit_alpha: true
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

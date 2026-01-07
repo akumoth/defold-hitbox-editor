@@ -1,0 +1,84 @@
+key_trigger {
+  input: KEY_PLUS
+  action: "zoom_in"
+}
+key_trigger {
+  input: KEY_MINUS
+  action: "zoom_out"
+}
+key_trigger {
+  input: KEY_A
+  action: "add_hitbox"
+}
+key_trigger {
+  input: KEY_DEL
+  action: "remove_hitbox"
+}
+key_trigger {
+  input: KEY_BACKSPACE
+  action: "key_backspace"
+}
+key_trigger {
+  input: KEY_ENTER
+  action: "key_enter"
+}
+key_trigger {
+  input: KEY_LEFT
+  action: "key_left"
+}
+key_trigger {
+  input: KEY_RIGHT
+  action: "key_right"
+}
+key_trigger {
+  input: KEY_LSHIFT
+  action: "mod"
+}
+key_trigger {
+  input: KEY_UP
+  action: "key_up"
+}
+key_trigger {
+  input: KEY_DOWN
+  action: "key_down"
+}
+key_trigger {
+  input: KEY_ESC
+  action: "cancel"
+}
+key_trigger {
+  input: KEY_S
+  action: "resize"
+}
+key_trigger {
+  input: KEY_LCTRL
+  action: "mod2"
+}
+key_trigger {
+  input: KEY_M
+  action: "move"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "touch"
+}
+mouse_trigger {
+  input: MOUSE_WHEEL_UP
+  action: "mouse_wheel_up"
+}
+mouse_trigger {
+  input: MOUSE_WHEEL_DOWN
+  action: "mouse_wheel_down"
+}
+touch_trigger {
+  input: TOUCH_MULTI
+  action: "touch_multi"
+}
+text_trigger {
+  input: TEXT
+  action: "text"
+}
+text_trigger {
+  input: MARKED_TEXT
+  action: "marked_text"
+}

@@ -1,0 +1,493 @@
+local druid = require("druid.druid")
+
+local file_load = require("main.ui.script.file_load")
+local anim_sel = require("main.ui.script.anim_sel")
+local frame_display = require("main.ui.script.frame_display")
+local hitbox = require("main.ui.script.hitbox")
+local attr_table = require("main.ui.script.attr_table")
+local resize_buttons = require("main.ui.script.resize_buttons")
+local imagesize = require('main.utils.imagesize.imagesize')
+
+local attr_tables = {}
+
+local active = nil
+local hitboxes = {}
+
+local changing_active = false
+
+local input_mod = false
+local input_mod2 = false
+local input_hold = 0
+
+local mode = "move"
+
+local attrs = {
+	offset = vmath.vector3(),
+}
+
+local function reset_active()
+	local resize_root = gui.get_node("resize_buttons")
+	gui.set_enabled(resize_root, false)
+	gui.set_parent(resize_root, nil)
+	resize_buttons.active = false
+
+	active = nil
+end
+
+local function create_hitboxes_table()
+	for name, _ in pairs(anim_sel.atlas) do
+		if not hitboxes[name] or next(hitboxes[name]) == nil then
+			hitboxes[name] = {}
+			hitboxes[name].attrs = {}
+		end
+		for idx, _ in ipairs(anim_sel.atlas[name].spr) do
+			if not hitboxes[name][idx] or next(hitboxes[name][idx]) == nil then
+				hitboxes[name][idx] = {}
+				hitboxes[name][idx].attrs = {}
+			end
+		end
+	end
+	
+end
+
+local function update_hitboxes(new, delete)
+	local anim = anim_sel.selected
+	local frame = frame_display.idx
+
+	if not delete then delete = hitboxes[anim][frame] end
+	
+	if delete and next(delete) then
+		for idx, _ in ipairs(delete) do
+			delete[idx]:delete()
+		end
+	end
+
+	if next(new) then
+		for idx, _ in ipairs(new) do
+			attr_tables.hitbox:update_attrs(new[idx].attrs)
+			new[idx]:create()
+		end
+	end
+end
+
+local function update_zoom(zoom)
+	if next(hitboxes) ~= nil then
+		for _, h in ipairs(hitboxes[anim_sel.selected][frame_display.idx]) do
+			h:set_zoom(zoom)
+		end	
+	end
+	local pivot = file_load.atlas[anim_sel.selected].pivot or vmath.vector3()
+
+	local size = gui.get_size(frame_display.spr_view)
+	
+	gui.set_position(frame_display.spr_view, vmath.vector3(
+		0+(((pivot.x ~= 0 and pivot.x or 0.5)-0.5)*size.x)+(attrs.offset.x*zoom),
+		0+(((pivot.y ~= 0 and pivot.y or 0.5)-0.5)*size.y)+(attrs.offset.y*zoom),
+		0)
+	)
+	gui.set_size(frame_display.spr_window, size)
+
+	resize_buttons:update()
+end
+
+
+function init(self)
+	self.druid = druid.new(self)
+	
+	file_load:init(self.druid)
+	anim_sel:init(self.druid, file_load.atlas)
+	frame_display:init(self.druid)
+	
+	attr_tables.editor = attr_table.new(self.druid, "editor_")
+	attr_tables.editor:init_attrs("editor")
+	
+	attr_tables.hitbox = attr_table.new(self.druid)
+	attr_tables.anim = attr_table.new(self.druid, "anim_")
+	attr_tables.frame = attr_table.new(self.druid, "frame_")
+end
+
+function final(self)
+	self.druid:final()
+end
+
+function update(self, dt)
+	if active and next(active) then
+		active:update(dt, self.mouse_pos - gui.get_position(frame_display.spr_window))
+	end
+
+	if input_hold > 0 then input_hold = input_hold + 1 end
+	
+	self.druid:update(dt)
+
+	if changing_active then
+		changing_active = false
+	end
+
+	msg.post("@render:", "draw_text", { text = "current mode: " .. mode, position = vmath.vector3(780, 620, 0) })
+end
+
+function on_message(self, message_id, message, sender)
+	if active ~= nil then
+		active:on_message(message_id, message, sender)
+	end
+	
+	if message_id == hash("file_loaded") then
+		anim_sel.atlas = file_load.atlas
+		anim_sel:set_nodes()
+		anim_sel:set_anim(next(file_load.atlas))
+
+		if next(attr_tables.anim.attrs) == nil then
+			attr_tables.anim:init_attrs("anim")
+		end
+
+		if next(attr_tables.frame.attrs) == nil then
+			attr_tables.frame:init_attrs("frame")
+		end
+		
+		create_hitboxes_table()
+
+		file_load:create_buttons(self.druid)
+	end
+	
+	if message_id == hash("update_attr") then
+		local anim = anim_sel.selected
+		local frame = frame_display.idx
+
+		if message.type == "frame" then
+			hitboxes[anim][frame].attrs[message.name] = message.value
+			if input_mod then 
+				for idx, _ in ipairs(hitboxes[anim]) do
+					if idx > frame then
+						hitboxes[anim][idx].attrs[message.name] = message.value
+					end
+				end
+			end
+		end
+		
+		if message.type == "anim" then
+			hitboxes[anim].attrs[message.name] = message.value
+		end
+
+		if message.type == "editor" then
+			if string.find(message.name, "offset") then
+				local axis = string.match(message.name, "^[%w]")
+				if string.match(message.value, "%-?%d+") then
+					attrs.offset[axis] = string.match(tonumber(message.value) or 0, "%-?%d+")
+				end
+				update_zoom(frame_display.zoom)
+				
+			else
+				editor.attrs[message.name] = message.value
+			end
+		end
+		 
+		anim_sel:update_colors(hitboxes[anim])
+	end
+	
+	if message_id == hash("load_hitbox_data") then
+		local _anim = anim_sel.selected
+		local _frame = frame_display.idx
+		
+		local tbl = file_load:load_hitbox_data(hitboxes)
+
+		if hitboxes[_anim][_frame] and next(hitboxes[_anim][_frame]) then
+			for idx, _ in ipairs(hitboxes[_anim][_frame]) do
+				hitboxes[_anim][_frame][idx]:delete()
+			end
+		end
+		for table, attrs in pairs(attr_tables) do
+			if table ~= "editor" then
+				attrs:update_attrs({})
+			end
+		end
+
+		for k in pairs(hitboxes) do
+			hitboxes[k] = nil
+		end
+		hitboxes = {}
+		
+		for anim_name, anim in pairs(tbl) do
+			local anim_str = string.gmatch(tostring(anim_name), '%[(.-)%]')()
+			hitboxes[anim_str] = {} 
+			hitboxes[anim_str].attrs = {}
+			
+			for frame_idx, frame in pairs(anim) do
+				if type(frame) == "table" then
+					hitboxes[anim_str][frame_idx] = {}
+					hitboxes[anim_str][frame_idx].attrs = {}
+					
+					for name, attr in pairs(frame) do
+						if name == "hitbox_data" then
+							for idx, data in ipairs(attr) do
+								hitboxes[anim_str][frame_idx][idx] = hitbox.new({
+									druid=self.druid,
+									pos=vmath.vector3(data.x_offset, data.y_offset, 0),
+									bounds=vmath.vector3(data.width, data.height, 0),
+									attrs={
+										is_player=data.is_player or true,
+										is_hurtbox=not data.is_hitbox,
+										is_clashable=data.is_clashable or false,
+										is_collision=data.is_collision or false,
+										knockback=data.knockback or 0,
+										angle=data.knockback_angle or 0,
+										duration=data.duration or 0,
+									}
+								})
+								hitboxes[anim_str][frame_idx][idx].idx = idx
+							end
+						else
+							if name == "state" then
+								attr = attr_table.frame_state[attr+2]
+							end
+							hitboxes[anim_str][frame_idx].attrs[name] = attr
+						end
+					end
+				else
+					if frame_idx == "extension" then
+						frame = string.gmatch(tostring(frame), "%[(.-)%]")()
+					end
+					hitboxes[anim_str].attrs[frame_idx] = frame
+				end
+			end
+		end
+
+		attr_tables.anim:update_attrs(hitboxes[_anim].attrs)
+		attr_tables.frame:update_attrs(hitboxes[_anim][_frame].attrs)
+
+		create_hitboxes_table()
+		reset_active()
+		update_hitboxes(hitboxes[_anim][_frame])		
+		update_zoom(frame_display.zoom)
+		
+		anim_sel:update_colors(hitboxes[_anim])
+	end
+	
+	if message_id == hash("save_hitbox_data") then
+		local hitbox_table = {}
+
+		for anim_name, anim in pairs(hitboxes) do
+			hitbox_table[anim_name] = {}
+			for frame_idx, frame in pairs(anim) do
+				if frame_idx ~= "attrs" then
+					hitbox_table[anim_name][frame_idx] = {}
+					for hitbox_idx, _hitbox in pairs(frame) do
+						if hitbox_idx ~= "attrs" then
+							hitbox_table[anim_name][frame_idx][hitbox_idx] = _hitbox:to_table()
+
+							local bytes = io.open(file_load.atlas[anim_name].spr[frame_idx]):read(200)
+							local kind, dimensions = imagesize.detect_image_from_bytes(bytes)
+
+							local pivot = hitbox_table[anim_name].pivot or vmath.vector3()
+							local hitbox_tbl = hitbox_table[anim_name][frame_idx][hitbox_idx]
+
+							hitbox_tbl.x_offset = hitbox_tbl.x_offset - (((pivot.x ~= 0 and pivot.x or 0.5)-0.5)*dimensions.width)
+							hitbox_tbl.y_offset = hitbox_tbl.y_offset - (((pivot.y ~= 0 and pivot.y or 0.5)-0.5)*dimensions.height)
+						else
+							hitbox_table[anim_name][frame_idx].attrs = {}
+							for attr_name, attr in pairs(_hitbox) do 
+								hitbox_table[anim_name][frame_idx].attrs[attr_name] = attr
+							end
+						end
+					end
+				else
+					hitbox_table[anim_name].attrs = {}
+					
+					for attr_name, attr in pairs(frame) do
+						hitbox_table[anim_name].attrs[attr_name] = attr
+					end
+				end
+			end
+		end
+
+		file_load:save_hitbox_data(hitbox_table)
+	end
+
+	if message_id == hash("set_anim") then
+		local anim = anim_sel.selected
+		local frame = frame_display.idx
+
+		anim_sel:set_anim(message.name)
+		if next(hitboxes[anim].attrs) ~= nil then
+			attr_tables.anim:set_attrs(hitboxes[anim].attrs)
+		end
+		attr_tables.anim:update_attrs(hitboxes[message.name].attrs)
+
+		if next(hitboxes[anim][frame].attrs) ~= nil then
+			attr_tables.frame:set_attrs(hitboxes[anim][frame].attrs)
+		end
+		attr_tables.frame:update_attrs(hitboxes[message.name][1].attrs)
+		
+		if anim == message.name then return end
+
+		if active ~= nil then attr_tables.hitbox:set_attrs(active.attrs) end
+		
+		update_hitboxes(hitboxes[message.name][1], hitboxes[anim][frame])
+		
+		reset_active()
+		update_zoom(frame_display.zoom)
+		anim_sel:update_colors(hitboxes[message.name])
+	end
+	
+	if message_id == hash("display_frame") then
+		local anim = anim_sel.selected
+		local frame = frame_display.idx
+
+		frame_display:display_frame(file_load.atlas, anim_sel.selected, message.idx)
+
+		if next(hitboxes[anim][frame].attrs) ~= nil then
+			attr_tables.frame:set_attrs(hitboxes[anim][frame].attrs)
+		end
+
+		local default
+
+		for i=message.idx-1, 1, -1 do
+			if hitboxes[anim][i] and hitboxes[anim][i].attrs then
+				default = hitboxes[anim][i].attrs
+				break
+			end
+		end
+		
+		attr_tables.frame:update_attrs(hitboxes[anim][message.idx].attrs, default)
+		
+		if frame == message.idx then return end
+
+		if active ~= nil then attr_tables.hitbox:set_attrs(active.attrs) end
+		
+		update_hitboxes(hitboxes[anim][message.idx], hitboxes[anim][frame])
+		update_zoom(frame_display.zoom)
+		reset_active()
+	end
+
+	if message_id == hash("set_zoom") then
+		update_zoom(message.zoom)
+	end
+
+	if message_id == hash("set_active") then
+		if active ~= hitboxes[anim_sel.selected][frame_display.idx][message.idx] and not changing_active then
+			if active ~= nil then attr_tables.hitbox:set_attrs(active.attrs) end
+			
+			active = hitboxes[anim_sel.selected][frame_display.idx][message.idx]
+			resize_buttons.active = active
+			resize_buttons:update()
+
+			attr_tables.hitbox:update_attrs(active.attrs)
+
+			changing_active = true
+
+			if next(attr_tables.hitbox.attrs) == nil then
+				attr_tables.hitbox:init_attrs("hitbox")
+			end
+			attr_tables.hitbox:update_attrs(active.attrs)
+		end
+	end
+
+	if message_id == hash("start_resize") then
+		changing_active = true
+	end
+	
+	if message_id == hash("update_resize_button") then
+		resize_buttons:update()
+	end
+
+	self.druid:on_message(message_id, message, sender)
+end
+
+function on_input(self, action_id, action)
+	if action and action.x then 
+		self.mouse_pos = vmath.vector3(action.x, action.y, 0)
+	end
+	
+	if action_id == hash("add_hitbox") and action.pressed then
+		if active ~= nil then attr_tables.hitbox:set_attrs(active.attrs) end
+		
+		if anim_sel.selected and not (active and active.creating) then
+			frame_display.can_click = false
+			
+			local nodes = gui.clone_tree(gui.get_node("hitbox_prefab"))
+			
+			gui.set_enabled(nodes.hitbox_prefab, true)
+			gui.set_position(nodes.hitbox_prefab, self.mouse_pos - gui.get_position(frame_display.spr_window))
+			
+			local anim = anim_sel.selected
+			local frame = frame_display.idx
+
+			table.insert(hitboxes[anim][frame], hitbox.new({druid=self.druid, nodes=nodes}))
+			hitboxes[anim][frame][#hitboxes[anim][frame]].idx = #hitboxes[anim][frame]
+			active = hitboxes[anim][frame][#hitboxes[anim][frame]]
+		end
+	end
+	
+	if active then 
+		if action_id == hash("cancel") then
+			if active.creating then
+				active = active:delete()
+
+				local anim = anim_sel.selected
+				local frame = frame_display.idx
+				table.remove(hitboxes[anim][frame], active.idx)
+				
+				frame_display.can_click = true
+			end
+		end
+		
+		if action_id == hash("touch") and action.pressed and active.creating then
+			active.zoom = frame_display.zoom
+			active:finish_create()
+			frame_display.can_click = true
+			if not resize_buttons.active then
+				resize_buttons:init(active, self.druid)
+			else
+				resize_buttons.active = active
+				resize_buttons:update()
+			end
+			if next(attr_tables.hitbox.attrs) == nil then
+				attr_tables.hitbox:init_attrs("hitbox")
+			end
+			attr_tables.hitbox:update_attrs(active.attrs)
+			
+			changing_active = true
+		end
+
+		if action_id == hash("remove_hitbox") and action.pressed then
+			gui.set_parent(gui.get_node("resize_buttons"), nil)
+			resize_buttons.active = nil
+			
+			local anim = anim_sel.selected
+			local frame = frame_display.idx
+			table.remove(hitboxes[anim][frame], active.idx)
+			
+			active = active:delete(true)
+		end
+
+		if string.find(tostring(action_id), "key") then
+			if action.pressed then
+				input_hold = 1
+				active[mode](active, action_id, input_mod)
+			elseif input_hold > 30 then
+				active[mode](active, action_id, input_mod, true)
+			end
+
+			if action.released then
+				input_hold = 0
+			end
+		end
+	end
+
+	if action_id == hash("resize") and action.pressed then
+		mode = "resize"
+	elseif action_id == hash("move") and action.pressed then
+		mode = "move"
+	end
+	
+	if action_id == hash("mod") then
+		if action.pressed then input_mod = true elseif action.released then input_mod = false end
+	end 
+	if action_id == hash("mod2") then
+		if action.pressed then input_mod2 = true elseif action.released then input_mod2 = false end
+	end 
+
+
+		
+	frame_display:on_input(action_id, action)
+	return self.druid:on_input(action_id, action)
+end
