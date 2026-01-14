@@ -1,0 +1,4 @@
+images {
+  image: "/data/grid.png"
+}
+extrude_borders: 2

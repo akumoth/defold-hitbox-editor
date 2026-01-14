@@ -1,0 +1,55 @@
+name: "sprite_repeat"
+tags: "tile"
+vertex_program: "/sprite_repeat/material/sprite_repeat.vp"
+fragment_program: "/sprite_repeat/material/sprite_repeat.fp"
+vertex_constants {
+  name: "view_proj"
+  type: CONSTANT_TYPE_VIEWPROJ
+}
+vertex_constants {
+  name: "uv_coord"
+  type: CONSTANT_TYPE_USER
+  value {
+  }
+}
+vertex_constants {
+  name: "uv_repeat"
+  type: CONSTANT_TYPE_USER
+  value {
+  }
+}
+vertex_constants {
+  name: "uv_rotated"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 1.0
+  }
+}
+fragment_constants {
+  name: "tint"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+}
+fragment_constants {
+  name: "direction"
+  type: CONSTANT_TYPE_USER
+  value {
+  }
+}
+samplers {
+  name: "texture_sampler"
+  wrap_u: WRAP_MODE_CLAMP_TO_EDGE
+  wrap_v: WRAP_MODE_CLAMP_TO_EDGE
+  filter_min: FILTER_MODE_MIN_DEFAULT
+  filter_mag: FILTER_MODE_MAG_DEFAULT
+}
+attributes {
+  name: "local_position"
+  semantic_type: SEMANTIC_TYPE_POSITION
+  vector_type: VECTOR_TYPE_VEC3
+}

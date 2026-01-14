@@ -8,6 +8,10 @@ local attr_table = require("main.ui.script.attr_table")
 local resize_buttons = require("main.ui.script.resize_buttons")
 local imagesize = require('main.utils.imagesize.imagesize')
 
+local icon_buttons = require("main.ui.script.icon_buttons")
+
+local node_repeat = require('main.utils.node_repeat.node_repeat')
+
 local attr_tables = {}
 
 local active = nil
@@ -76,17 +80,23 @@ local function update_zoom(zoom)
 			h:set_zoom(zoom)
 		end	
 	end
-	local pivot = file_load.atlas[anim_sel.selected].pivot or vmath.vector3()
 
-	local size = gui.get_size(frame_display.spr_view)
+	if file_load.atlas then
+		local pivot = file_load.atlas[anim_sel.selected].pivot or vmath.vector3()
+		local size = gui.get_size(frame_display.spr_view)
+
+		gui.set_position(frame_display.spr_view, vmath.vector3(
+			0+(((pivot.x ~= 0 and pivot.x or 0.5)-0.5)*size.x)+(attrs.offset.x*zoom),
+			0+(((pivot.y ~= 0 and pivot.y or 0.5)-0.5)*size.y)+(attrs.offset.y*zoom),
+			0)
+		)
+		gui.set_size(frame_display.spr_window, size)
+	end
+
+	gui.set_size(frame_display.grid, vmath.vector3(32*zoom, 32*zoom, 1))
+	gui.set_size(frame_display.origin, vmath.vector3(64*zoom, 32*zoom, 1))
+	gui.set_position(frame_display.origin, vmath.vector3(0, -32*zoom, 1 ))
 	
-	gui.set_position(frame_display.spr_view, vmath.vector3(
-		0+(((pivot.x ~= 0 and pivot.x or 0.5)-0.5)*size.x)+(attrs.offset.x*zoom),
-		0+(((pivot.y ~= 0 and pivot.y or 0.5)-0.5)*size.y)+(attrs.offset.y*zoom),
-		0)
-	)
-	gui.set_size(frame_display.spr_window, size)
-
 	resize_buttons:update()
 end
 
@@ -95,8 +105,10 @@ function init(self)
 	self.druid = druid.new(self)
 	
 	file_load:init(self.druid)
-	anim_sel:init(self.druid, file_load.atlas)
+	anim_sel:init(self.druid, file_load.atlas, hitboxes)
 	frame_display:init(self.druid)
+
+	icon_buttons:init(self.druid)
 	
 	attr_tables.editor = attr_table.new(self.druid, "editor_")
 	attr_tables.editor:init_attrs("editor")
@@ -130,6 +142,15 @@ function on_message(self, message_id, message, sender)
 	if active ~= nil then
 		active:on_message(message_id, message, sender)
 	end
+
+	if message_id == hash("atlas") then
+		local atlas_path = message.atlas
+		local node = gui.get_node("grid")
+		local scale = gui.get_scale(node)
+		
+		local nr = node_repeat.create(node, nil, atlas_path)
+		nr.animate(scale.x, scale.y)
+	end
 	
 	if message_id == hash("file_loaded") then
 		anim_sel.atlas = file_load.atlas
@@ -147,6 +168,10 @@ function on_message(self, message_id, message, sender)
 		create_hitboxes_table()
 
 		file_load:create_buttons(self.druid)
+	end
+
+	if message_id == hash("icon_buttons_init") then
+		require("main.ui.script.prefabs.icon_button_prefabs"):make_prefabs(icon_buttons)
 	end
 	
 	if message_id == hash("update_attr") then
@@ -175,7 +200,9 @@ function on_message(self, message_id, message, sender)
 					attrs.offset[axis] = string.match(tonumber(message.value) or 0, "%-?%d+")
 				end
 				update_zoom(frame_display.zoom)
-				
+
+			elseif message.name == "frame_view_state" then
+				anim_sel:change_frame_view(message.value)
 			else
 				editor.attrs[message.name] = message.value
 			end

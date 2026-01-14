@@ -60,6 +60,9 @@ function frame_display:init(druid)
 	self.spr_view = gui.get_node("sprite_view")
 	self.spr_window = gui.get_node("sprite_window")
 
+	self.grid = gui.get_node("grid")
+	self.origin = gui.get_node("origin")
+
 	self.can_click = true
 end
 

@@ -2,6 +2,7 @@ local class = require('main.utils.class')
 local attr_table = class.new_class({})
 
 attr_table.frame_state = {"INACTIVE", "STARTUP", "ACTIVE", "RECOVERY"}
+attr_table.frame_view_state = {"ALL", "NEW FRAME + HITBOX", "ONLY NEW FRAME", "ONLY W/HITBOX"}
 
 function attr_table.new(druid, prefix)
 	assert(druid)
@@ -356,6 +357,28 @@ function attr_table:init_attrs(attr_type)
 				allowed="[%-?%d+]",
 				callback = function (value)
 					msg.post(".", "update_attr", {type="editor", name="y_offset", value=value})
+				end
+			})
+			self:create_attr({
+				name="Frames to\ndisplay",
+				type="range",
+				values=self.frame_view_state,
+				callback = function (value)
+					if type(value) == "number" then
+						local val_table = self.frame_view_state
+						value = val_table[(value*(#self.frame_view_state-1))+1]
+					end
+
+					local idx
+
+					for i=1, #self.frame_view_state do
+						if self.frame_view_state[i] == value then
+							idx = i
+							break
+						end
+					end
+					
+					msg.post(".", "update_attr", {type="editor", name="frame_view_state", value=idx})
 				end
 			})
 		end

@@ -2,95 +2,11 @@
   :code {
     :find {
       :replacement ""
-      :term "idle"
+      :term "attrs"
     }
   }
   :workflow {
     :recent-files [
-      [
-        "/game.project"
-        :cljfx-form-view
-      ]
-      [
-        "/wwowow"
-        :code
-      ]
-      [
-        "/builtins/render/default.render_script"
-        :code
-      ]
-      [
-        "/main/ui/script/frame_display.lua"
-        :code
-      ]
-      [
-        "/main/ui/ui.gui"
-        :scene
-      ]
-      [
-        "/main/ui/script/hitbox.lua"
-        :code
-      ]
-      [
-        "/wew"
-        :code
-      ]
-      [
-        "/hhhhhh"
-        :code
-      ]
-      [
-        "/hello"
-        :code
-      ]
-      [
-        "/waw"
-        :code
-      ]
-      [
-        "/GAOOOOO"
-        :code
-      ]
-      [
-        "/GAO"
-        :code
-      ]
-      [
-        "/test2"
-        :code
-      ]
-      [
-        "/test"
-        :code
-      ]
-      [
-        "/test4"
-        :code
-      ]
-      [
-        "/test5"
-        :code
-      ]
-      [
-        "/test3"
-        :code
-      ]
-      [
-        "/main/ui/script/resize_buttons.lua"
-        :code
-      ]
-      [
-        "/main/utils/imagesize/imagesize/init.lua"
-        :code
-      ]
-      [
-        "/onearmed"
-        :code
-      ]
-      [
-        "/welcome"
-        :code
-      ]
       [
         "/wwowooww"
         :code
@@ -112,19 +28,7 @@
         :code
       ]
       [
-        "/main/ui/script/attr_table.lua"
-        :code
-      ]
-      [
-        "/main/ui/script/file_load.lua"
-        :code
-      ]
-      [
         "/wow"
-        :code
-      ]
-      [
-        "/main/ui/script/anim.gui_script"
         :code
       ]
       [
@@ -133,6 +37,102 @@
       ]
       [
         "/main/utils/orderedPairs.lua"
+        :code
+      ]
+      [
+        "/README.md"
+        :code
+      ]
+      [
+        "/data/empty.atlas"
+        :scene
+      ]
+      [
+        "/data/arrow.atlas"
+        :scene
+      ]
+      [
+        "/data/grid.atlas"
+        :scene
+      ]
+      [
+        "/main/utils/node_repeat/material/gui_repeat.vp"
+        :code
+      ]
+      [
+        "/main/utils/node_repeat/material/gui_repeat.fp"
+        :code
+      ]
+      [
+        "/main/utils/node_repeat/material/gui_repeat.material"
+        :cljfx-form-view
+      ]
+      [
+        "/game.project"
+        :cljfx-form-view
+      ]
+      [
+        "/README.md"
+        :html
+      ]
+      [
+        "/data/origin.atlas"
+        :scene
+      ]
+      [
+        "/data/gridbutton.atlas"
+        :scene
+      ]
+      [
+        "/druid/base/button.lua"
+        :code
+      ]
+      [
+        "/data/originbutton.atlas"
+        :scene
+      ]
+      [
+        "/main/ui/script/prefabs/icon_button_prefabs.lua"
+        :code
+      ]
+      [
+        "/main/main.collection"
+        :scene
+      ]
+      [
+        "/main/ui/script/atlas.script"
+        :code
+      ]
+      [
+        "/main/utils/node_repeat/node_repeat.lua"
+        :code
+      ]
+      [
+        "/main/ui/ui.gui"
+        :scene
+      ]
+      [
+        "/main/ui/script/file_load.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/anim.gui_script"
+        :code
+      ]
+      [
+        "/main/ui/script/attr_table.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/frame_display.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/icon_buttons.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/anim_sel.lua"
         :code
       ]
     ]

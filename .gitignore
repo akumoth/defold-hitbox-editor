@@ -9,3 +9,6 @@ Thumbs.db
 .project
 .cproject
 builtins
+/.editor_settings
+/.internal
+/build

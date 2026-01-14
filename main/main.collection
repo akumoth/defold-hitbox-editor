@@ -1,6 +1,20 @@
 name: "main"
 instances {
-  id: "file_browser"
+  id: "ui"
   prototype: "/main/ui/ui.go"
+  children: "grid_atlas"
 }
 scale_along_z: 0
+embedded_instances {
+  id: "grid_atlas"
+  data: "components {\n"
+  "  id: \"atlas\"\n"
+  "  component: \"/main/ui/script/atlas.script\"\n"
+  "  properties {\n"
+  "    id: \"atlas\"\n"
+  "    value: \"/data/grid.atlas\"\n"
+  "    type: PROPERTY_TYPE_HASH\n"
+  "  }\n"
+  "}\n"
+  ""
+}

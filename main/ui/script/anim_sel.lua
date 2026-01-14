@@ -1,5 +1,7 @@
 local anim_sel =  {}
 
+local frame_view_state = {"ALL", "NEW FRAME + HITBOX", "ONLY NEW FRAME", "ONLY W/HITBOX"}
+
 function anim_sel:set_anim(name)
 	for idx = 1, #self.frame_idx.buttons do
 		self.druid:remove(self.frame_idx.buttons[idx])
@@ -13,16 +15,45 @@ function anim_sel:set_anim(name)
 	self.frame_idx.grid:clear()
 	
 	self.selected = name
+
+	local cur_img
 	for idx, img in pairs(self.atlas[name].spr) do
-		local node = gui.clone_tree(gui.get_node("frame_idx_but"))
-		local root = node.frame_idx_but
-		local text = node.num
+		local continue = false
+		if idx ~= 1 then
+			if self.frame_view_state == 2 or self.frame_view_state == 4 then
+				if self.hitboxes[name] and self.hitboxes[name][idx] then
+					if next(self.hitboxes[name][idx]) ~= nil and next(self.hitboxes[name][idx]) ~= "attrs" then
+						continue = true
+					end
+				end
+			end
+			if self.frame_view_state == 2 or self.frame_view_state == 3 then
+				if cur_img ~= img then
+					continue = true
+				end
+			end
+			if self.frame_view_state == 1 then
+				continue = true
+			end
+		else
+			continue = true
+		end
 
-		gui.set_text(text, idx)
+		if cur_img ~= img then
+			cur_img = img
+		end
 
-		gui.set_enabled(root, true)
-		self.frame_idx.grid:add(root)
-		table.insert(self.frame_idx.buttons, self.druid:new_button(root, function () msg.post(".", "display_frame", {idx=idx}) end))
+		if continue then		
+			local node = gui.clone_tree(gui.get_node("frame_idx_but"))
+			local root = node.frame_idx_but
+			local text = node.num
+
+			gui.set_text(text, idx)
+
+			gui.set_enabled(root, true)
+			self.frame_idx.grid:add(root)
+			table.insert(self.frame_idx.buttons, self.druid:new_button(root, function () msg.post(".", "display_frame", {idx=idx}) end))
+		end
 	end
 	msg.post(".", "display_frame", {idx=next(self.frame_idx.buttons)})
 end
@@ -56,7 +87,14 @@ function anim_sel:set_nodes()
 	return
 end
 
-function anim_sel:init(druid, atlas)
+function anim_sel:change_frame_view(state, hitboxes)
+	self.frame_view_state = state
+	if self.selected then
+		self:set_anim(self.selected)
+	end
+end
+
+function anim_sel:init(druid, atlas, hitboxes)
 	self.druid = druid
 	
 	self.view = druid:new_grid("anim_sel_content", "anim_sel_but", 1)
@@ -65,16 +103,17 @@ function anim_sel:init(druid, atlas)
 
 	self.buttons = {}
 	
-	
 	self.frame_idx = {}
 	self.frame_idx.grid = druid:new_grid("frame_idx_content", "frame_idx_but", 8)
 	self.frame_idx.scroll = druid:new_scroll("frame_idx_view", "frame_idx_content")
 	self.frame_idx.scroll:bind_grid(self.frame_idx.grid)
 	
 	self.frame_idx.buttons = {}
+
+	self.frame_view_state = 1
 	
 	self.atlas = atlas
-
+	self.hitboxes = hitboxes
 end
 
 

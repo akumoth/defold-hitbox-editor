@@ -1,0 +1,47 @@
+go.property("url", msg.url("#sprite"))
+go.property("repeat_x", 2)
+go.property("repeat_y", 2)
+go.property("auto_tiling", false)
+
+go.property("repeat_material", resource.material("/sprite_repeat/material/sprite_repeat.material"))
+
+local sprite_repeat = require('sprite_repeat.sprite_repeat')
+
+function init(self)
+
+    -- Send 'fit projection' to render script.
+    msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1 })
+
+    -- If auto tiling is enabled then use sprite 'scale' value as the sprite repeat factor.  
+    if self.auto_tiling then
+        local scale = go.get(self.url, "scale")
+        self.repeat_x = scale.x
+        self.repeat_y = scale.y
+    end
+
+    -- Set repeat material to the sprite.
+    go.set(self.url, "material", self.repeat_material)
+
+    -- Create and go our super-puper repeating magic.
+    local sr = sprite_repeat.create(self.url)
+    sr.animate(self.repeat_x, self.repeat_y)
+
+    -- Shifting (Scrolling) animation:
+    -- Constant direction is... a direction vector (x, y). Where direction.w is shifting delta (0...1).
+    -- Changing the 'direction.w' value you will get a scrolling texture.
+    go.set(self.url, "direction", vmath.vector4(-1, -1, 0, 0))
+    go.animate(self.url, "direction.x", go.PLAYBACK_LOOP_PINGPONG, 1, go.EASING_INOUTSINE, 10)
+    go.animate(self.url, "direction.y", go.PLAYBACK_LOOP_PINGPONG, 1, go.EASING_INOUTSINE, 20)
+    go.animate(self.url, "direction.w", go.PLAYBACK_LOOP_FORWARD, 1, go.EASING_LINEAR, 10)
+
+
+    -- How to change repeat factor at runtime:
+    -- go.animate(self.url, "uv_repeat.x", go.PLAYBACK_ONCE_FORWARD, 10, go.EASING_LINEAR, 0)
+    -- go.animate(self.url, "uv_repeat.y", go.PLAYBACK_ONCE_FORWARD, 10, go.EASING_LINEAR, 0)
+    -- or:
+    -- go.set(self.url, "uv_repeat.x", 10)
+
+end
+
+function final(self)
+end
