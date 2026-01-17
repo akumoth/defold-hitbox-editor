@@ -1,8 +1,7 @@
 local class = require('main.utils.class')
 local attr_table = class.new_class({})
 
-attr_table.frame_state = {"INACTIVE", "STARTUP", "ACTIVE", "RECOVERY"}
-attr_table.frame_view_state = {"ALL", "NEW FRAME + HITBOX", "ONLY NEW FRAME", "ONLY W/HITBOX"}
+local const = require("main.ui.script.constants")
 
 function attr_table.new(druid, prefix)
 	assert(druid)
@@ -89,7 +88,7 @@ function attr_table:create_attr(attr)
 				table.insert(steps,i/attr.max)
 			end
 			slider:set_steps(steps)
-			slider:set(steps[attr.content or 1])
+			slider:set(steps[type(attr.content) == "number" and attr.content or 1])
 		end
 
 		if not attr.values then 
@@ -132,12 +131,13 @@ function attr_table:create_attr(attr)
 								break
 							end
 						end
-						
+
 						slider:set(i/attr.max)
 						return
 					end
+				else
+					slider:set(value/attr.max)
 				end
-				slider:set(value/attr.max)
 			end,
 			values = attr.values
 		}
@@ -229,6 +229,49 @@ function attr_table:init_attrs(attr_type)
 	if next(self.attrs) == nil then
 		if attr_type == "hitbox" then
 			self:create_attr({
+				name="duration",
+				type="range",
+				max=10,
+				callback= function (value)
+					msg.post(".", "update_attr", {type="hitbox", name="duration", value=value})
+				end
+			})
+			self:create_attr({
+				name="hitbox_type",
+				type="range",
+				values=const.HITBOX_TYPE,
+				content="hurtbox",
+				callback= function (value)
+					local type = const.HITBOX_TYPE[(value*(#const.HITBOX_TYPE-1))+1]
+
+					if self.attrs.hitbox_type then
+						if type == "hitbox" then
+							for i=1, #const.HITBOX_ATTRS do
+								gui.set_enabled(self.attrs[const.HITBOX_ATTRS[i]].nodes.root, true)
+								self.view:refresh()
+							end
+						else
+							for i=1, #const.HITBOX_ATTRS do
+								gui.set_enabled(self.attrs[const.HITBOX_ATTRS[i]].nodes.root, false)
+								self.view:refresh()
+							end
+						end
+					end
+
+					msg.post(".", "update_color", {type = type})
+					
+					if type == "hitbox" then
+						if self.attrs.angle and self.attrs.knockback then
+							msg.post(".", "add_knockback", {angle = self.attrs.angle.input.get_value(), knockback = self.attrs.knockback.input.get_value()})
+						end
+					else
+						msg.post(".", "remove_knockback")
+					end
+
+					msg.post(".", "update_attr", {type="hitbox", name="hitbox_type", value=type})
+				end
+			})
+			self:create_attr({
 				name="angle",
 				type="range",
 				content=1,
@@ -237,6 +280,7 @@ function attr_table:init_attrs(attr_type)
 					if self.attrs.angle and self.attrs.knockback then
 						msg.post(".", "update_knockback", {angle = self.attrs.angle.input.get_value(), knockback = self.attrs.knockback.input.get_value()})
 					end
+					msg.post(".", "update_attr", {type="hitbox", name="angle", value=value})
 				end
 			})
 			self:create_attr({
@@ -248,43 +292,33 @@ function attr_table:init_attrs(attr_type)
 					if self.attrs.angle and self.attrs.knockback then
 						msg.post(".", "update_knockback", {angle = self.attrs.angle.input.get_value(), knockback = self.attrs.knockback.input.get_value()})
 					end
+					msg.post(".", "update_attr", {type="hitbox", name="knockback", value=value})
 				end
-			})
-			self:create_attr({
-				name="duration",
-				type="range",
-				content=1,
-				max=10
-			})
-			self:create_attr({
-				name="is_hurtbox",
-				type="bool",
-				content=true,
-				callback= function (value)
-					msg.post(".", "update_color", {hurtbox = value})
-					if self.attrs.angle and self.attrs.knockback then
-						if value == false then
-							msg.post(".", "add_knockback", {angle = self.attrs.angle.input.get_value(), knockback = self.attrs.knockback.input.get_value()})
-						else
-							msg.post(".", "remove_knockback")
-						end
-					end
-				end
-			})
-			self:create_attr({
-				name="is_player",
-				type="bool",
-				content=true
 			})
 			self:create_attr({
 				name="is_clashable",
 				type="bool",
-				content=false
+				content=false,
+				callback = function (value)
+					msg.post(".", "update_attr", {type="hitbox", name="is_clashable", value=value})
+				end
 			})
 			self:create_attr({
 				name="is_collision",
 				type="bool",
-				content=false
+				content=false,
+				callback = function (value)
+					msg.post(".", "update_attr", {type="hitbox", name="is_collision", value=value})
+				end
+			})
+			self:create_attr({
+				name="damage",
+				type="text",
+				content="",
+				allowed="[%d]",
+				callback = function (value)
+					msg.post(".", "update_attr", {type="hitbox", name="damage", value=value})
+				end
 			})
 		end
 
@@ -312,11 +346,11 @@ function attr_table:init_attrs(attr_type)
 			self:create_attr({
 				name="state",
 				type="range",
-				values=self.frame_state,
+				values=const.FRAME_STATE,
 				callback = function (value)
 					if type(value) == "number" then
-						local val_table = self.frame_state
-						value = val_table[(value*(#self.frame_state-1))+1]
+						local val_table = const.FRAME_STATE
+						value = val_table[(value*(#const.FRAME_STATE-1))+1]
 					end
 					
 					msg.post(".", "update_attr", {type="frame", name="state", value=value})
@@ -336,6 +370,24 @@ function attr_table:init_attrs(attr_type)
 				content=false,
 				callback = function (value)
 					msg.post(".", "update_attr", {type="frame", name="can_extend", value=value})
+				end
+			})
+			self:create_attr({
+				name="add_speed_x",
+				type="text",
+				content="0",
+				allowed="[%-?%d+]",
+				callback = function (value)
+					msg.post(".", "update_attr", {type="frame", name="add_speed_x", value=value})
+				end
+			})
+			self:create_attr({
+				name="add_speed_y",
+				type="text",
+				content="0",
+				allowed="[%-?%d+]",
+				callback = function (value)
+					msg.post(".", "update_attr", {type="frame", name="add_speed_y", value=value})
 				end
 			})
 		end
@@ -362,17 +414,17 @@ function attr_table:init_attrs(attr_type)
 			self:create_attr({
 				name="Frames to\ndisplay",
 				type="range",
-				values=self.frame_view_state,
+				values=const.FRAME_VIEW_STATE,
 				callback = function (value)
 					if type(value) == "number" then
-						local val_table = self.frame_view_state
-						value = val_table[(value*(#self.frame_view_state-1))+1]
+						local val_table = const.FRAME_VIEW_STATE
+						value = val_table[(value*(#const.FRAME_VIEW_STATE-1))+1]
 					end
 
 					local idx
 
-					for i=1, #self.frame_view_state do
-						if self.frame_view_state[i] == value then
+					for i=1, #const.FRAME_VIEW_STATE do
+						if const.FRAME_VIEW_STATE[i] == value then
 							idx = i
 							break
 						end

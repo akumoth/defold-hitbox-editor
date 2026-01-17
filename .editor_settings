@@ -2,43 +2,11 @@
   :code {
     :find {
       :replacement ""
-      :term "attrs"
+      :term "set_size"
     }
   }
   :workflow {
     :recent-files [
-      [
-        "/wwowooww"
-        :code
-      ]
-      [
-        "/www"
-        :code
-      ]
-      [
-        "/wwwwwwwwwwwwwwow"
-        :code
-      ]
-      [
-        "/woow"
-        :code
-      ]
-      [
-        "/wuw"
-        :code
-      ]
-      [
-        "/wow"
-        :code
-      ]
-      [
-        "/main/utils/class.lua"
-        :code
-      ]
-      [
-        "/main/utils/orderedPairs.lua"
-        :code
-      ]
       [
         "/README.md"
         :code
@@ -92,39 +60,31 @@
         :scene
       ]
       [
-        "/main/ui/script/prefabs/icon_button_prefabs.lua"
-        :code
-      ]
-      [
         "/main/main.collection"
         :scene
-      ]
-      [
-        "/main/ui/script/atlas.script"
-        :code
       ]
       [
         "/main/utils/node_repeat/node_repeat.lua"
         :code
       ]
       [
-        "/main/ui/ui.gui"
+        "/data/playerbutton.atlas"
         :scene
       ]
       [
-        "/main/ui/script/file_load.lua"
+        "/data/enemybutton.atlas"
+        :scene
+      ]
+      [
+        "/druid/helper.lua"
         :code
       ]
       [
-        "/main/ui/script/anim.gui_script"
+        "/druid/base/static_grid.lua"
         :code
       ]
       [
-        "/main/ui/script/attr_table.lua"
-        :code
-      ]
-      [
-        "/main/ui/script/frame_display.lua"
+        "/main/ui/script/atlas.script"
         :code
       ]
       [
@@ -132,7 +92,47 @@
         :code
       ]
       [
+        "/main/ui/script/prefabs/icon_button_prefabs.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/frame_display.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/constants.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/file_load.lua"
+        :code
+      ]
+      [
+        "/main/utils/table_utils.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/attr_table.lua"
+        :code
+      ]
+      [
         "/main/ui/script/anim_sel.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/anim.gui_script"
+        :code
+      ]
+      [
+        "/main/ui/ui.gui"
+        :scene
+      ]
+      [
+        "/main/ui/script/resize_buttons.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/hitbox.lua"
         :code
       ]
     ]

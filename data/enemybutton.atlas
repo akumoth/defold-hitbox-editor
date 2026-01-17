@@ -1,0 +1,4 @@
+images {
+  image: "/data/enemybutton.png"
+}
+extrude_borders: 2

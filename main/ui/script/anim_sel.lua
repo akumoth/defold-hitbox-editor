@@ -1,4 +1,5 @@
 local anim_sel =  {}
+local tbl_utils = require('main.utils.table_utils')
 
 local frame_view_state = {"ALL", "NEW FRAME + HITBOX", "ONLY NEW FRAME", "ONLY W/HITBOX"}
 
@@ -69,19 +70,27 @@ function anim_sel:set_nodes()
 
 	self.view:clear()
 
-	for name, anim in pairs(self.atlas) do
+	local sorted_atlas_keys = {}
+	
+	for k in pairs(self.atlas) do
+		table.insert(sorted_atlas_keys, k)
+	end
+
+	table.sort(sorted_atlas_keys)
+	
+	for i=1, #sorted_atlas_keys do
 
 		local node = gui.clone_tree(gui.get_node("anim_sel_but"))
 
 		local root = node.anim_sel_but
 		local text = node.name
 
-		gui.set_text(text, name)	
+		gui.set_text(text, sorted_atlas_keys[i])	
 
 		gui.set_enabled(root, true)
 		self.view:add(root)
 		table.insert(self.buttons, self.druid:new_button(root, function () 
-			msg.post(".", "set_anim", {name=name})
+			msg.post(".", "set_anim", {name=sorted_atlas_keys[i]})
 		end))
 	end
 	return
@@ -125,20 +134,25 @@ anim_sel.colors = {
 }
 
 function anim_sel:update_colors(frames)
-	for idx, value in pairs(self.frame_idx.grid.nodes) do
-		if frames[idx] and next(frames[idx].attrs) ~= nil then
-			local node
-			local node_tree = gui.get_tree(value)
-			
-			for _, _value in pairs(node_tree) do
-				if gui.get_type(_value) ~= gui.TYPE_TEXT and gui.get_size(_value) == gui.get_size(gui.get_node("frame_idx")) then
-					node = _value
-					break
-				end
+	for _, value in pairs(self.frame_idx.grid.nodes) do
+		local node
+		local text_node
+		local node_tree = gui.get_tree(value)
+
+		for _, _value in pairs(node_tree) do
+			if gui.get_type(_value) == gui.TYPE_TEXT then
+				text_node = _value
 			end
 			
-			if frames[idx].attrs.state then
-				gui.set_color(node, self.colors[frames[idx].attrs.state])
+			if gui.get_type(_value) ~= gui.TYPE_TEXT and gui.get_size(_value) == gui.get_size(gui.get_node("frame_idx")) then
+				node = _value
+			end
+		end
+
+		local f_idx = tonumber(gui.get_text(text_node))
+		if frames[f_idx] and next(frames[f_idx].attrs) ~= nil then
+			if frames[f_idx].attrs.state then
+				gui.set_color(node, self.colors[frames[f_idx].attrs.state])
 			end
 		end
 	end

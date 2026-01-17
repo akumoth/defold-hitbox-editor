@@ -1,0 +1,4 @@
+images {
+  image: "/data/playerbutton.png"
+}
+extrude_borders: 2

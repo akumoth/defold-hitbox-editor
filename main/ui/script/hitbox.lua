@@ -1,5 +1,6 @@
 local class = require('main.utils.class')
 local hitbox = class.new_class({})
+local const = require("main.ui.script.constants")
 
 function hitbox:_create_drag_function()
 	return function (_, dx, dy)
@@ -171,13 +172,17 @@ function hitbox:create()
 			msg.post(".","set_active", {idx=self.idx})
 		end)
 
-		if not self.attrs.is_hurtbox then
-			self:add_knockback(self.attrs.angle or 1, self.attrs.knockback or 1)
-			self:set_color({
-				fill = (vmath.vector4(255/255, 204/255, 204/255, 1)),
-				border = (vmath.vector4(204/255, 153/255, 153/255, 1)) 
-			})
+		if not self.attrs.hitbox_type then
+			self.attrs.hitbox_type = "hurtbox"
 		end
+		
+		if self.attrs.hitbox_type == "hitbox" then
+			self:add_knockback(self.attrs.angle or 1, self.attrs.knockback or 1)
+		end
+		self:set_color({
+			fill = const.HITBOX_COLORS[self.attrs.hitbox_type],
+			border = const.HITBOX_COLORS[self.attrs.hitbox_type] 
+		})
 	end
 end
 
@@ -190,6 +195,7 @@ function hitbox:delete(clear)
 
 	for _, value in pairs(self.nodes) do
 		gui.delete_node(value)
+		self.nodes[_] = nil
 	end
 
 	if clear then
@@ -220,7 +226,7 @@ function hitbox:set_size(new_size)
 	gui.set_size(self.nodes.fill, new_size)
 	gui.set_size(self.nodes.border, vmath.vector3(new_size.x+4,new_size.y+4,1))
 
-	self.bounds = new_size
+	self.bounds = new_size/self.zoom
 end
 
 function hitbox:set_color(color)
@@ -247,7 +253,7 @@ function hitbox:resize(action_id, mod, hold)
 		gui.set_position(self.nodes.root, vmath.vector3(pos.x, pos.y-(d)/2, 0))
 	end
 
-	self.pos = gui.get_position(self.nodes.root)
+	self.pos = gui.get_position(self.nodes.root)/self.zoom
 	
 	msg.post(".","update_resize_button")
 end
@@ -265,25 +271,29 @@ function hitbox:update_knockback(angle, size)
 end
 
 function hitbox:add_knockback(angle, size)
-	local arrow = gui.clone(gui.get_node("arrow"))
+	if not self.nodes.arrow then
+		local arrow = gui.clone(gui.get_node("arrow"))
 
-	gui.set_enabled(arrow, true)
-	gui.set_parent(arrow, self.nodes.root)
-	self.nodes.arrow = arrow
+		gui.set_enabled(arrow, true)
+		gui.set_parent(arrow, self.nodes.root)
+		self.nodes.arrow = arrow
+	end
 
 	self:update_knockback(angle, size)
 end
 
 function hitbox:remove_knockback()
-	gui.delete_node(self.nodes.arrow)
+	if self.nodes.arrow then 
+		gui.delete_node(self.nodes.arrow)
+	end
 	self.nodes.arrow = nil
 end
 
 function hitbox:on_message(message_id, message, sender)
 	if message_id == hash("update_color") then
 		local color = {
-			fill = (message.hurtbox and vmath.vector4(204/255, 255/255, 204/255, 1) or vmath.vector4(255/255, 204/255, 204/255, 1)),
-			border = (message.hurtbox and vmath.vector4(153/255, 204/255, 153/255, 1) or vmath.vector4(204/255, 153/255, 153/255, 1)) 
+			fill = const.HITBOX_COLORS[message.type],
+			border = const.HITBOX_BORDER_COLORS[message.type]
 		}
 		self:set_color(color)
 	end
@@ -307,13 +317,16 @@ function hitbox:to_table()
 		y_offset=math.floor(self.pos.y),
 		width=math.floor(self.bounds.x),
 		height=math.floor(self.bounds.y),
-		is_player=self.attrs.is_player or true,
-		is_hitbox=(not self.attrs.is_hurtbox) or false,
+		hitbox_type=self.attrs.hitbox_type or "hurtbox",
 	}
-	if self.attrs.is_clashable then data.is_clashable = self.attrs.is_clashable end
-	if self.attrs.is_clashable then data.is_collision = self.attrs.is_collision end
-	if self.attrs.knockback then data.knockback = self.attrs.knockback end
-	if self.attrs.angle then data.knockback_angle = self.attrs.angle end
+
+	if self.attrs.hitbox_type == "hitbox" then
+		if self.attrs.is_clashable then data.is_clashable = self.attrs.is_clashable end
+		if self.attrs.is_collision then data.is_collision = self.attrs.is_collision end
+		if self.attrs.knockback then data.knockback = self.attrs.knockback end
+		if self.attrs.angle then data.knockback_angle = self.attrs.angle end
+		if self.attrs.damage then data.damage = self.attrs.damage end
+	end
 	if self.attrs.duration then data.duration = self.attrs.duration end
 
 	return data

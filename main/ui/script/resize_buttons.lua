@@ -9,7 +9,7 @@ function resize_buttons:update()
 		gui.set_enabled(resize_root, true)
 	end
 		
-	if self.active then
+	if self.active and self.active.nodes.root then
 		local size = gui.get_size(self.active.nodes.root)
 		
 		gui.set_size(resize_root, size)
