@@ -58,6 +58,8 @@ function file_load:load_hitbox_data(hitboxes)
 	if not err then
 		local tbl = f()
 		return tbl
+	else
+		print(err)
 	end
 end
 
@@ -115,51 +117,57 @@ function file_load:save_hitbox_data(hitboxes, owner)
 
 	if luatbl ~= nil then
 		luatbl:write("local framedata = {}" .. ln .. ln .. "local FRAME_STATUS = { INACTIVE = -1, STARTUP = 0, ACTIVE = 1, RECOVERY = 2 }" .. ln .. ln .. "framedata.is_player = " .. (owner == "player" and "true" or "false") .. ln .. ln)
-		for anim_name, anim in pairs(exported_list) do
-			luatbl:write('framedata[hash("' .. anim_name .. '")] = {' .. ln)
 
-			if anim.attrs then
-				for attr_name, attr in pairs(anim.attrs) do
-					luatbl:write(lt .. attr_name .. " = " .. attr .. "," .. ln)
-				end
-			end
+		local sorted_exported_keys = tbl_utils.get_sorted_keys(exported_list)
+
+		for i=1, #sorted_exported_keys do
+			local anim_name = sorted_exported_keys[i]
+			local anim = exported_list[anim_name]
+			
+			luatbl:write('framedata[hash("' .. anim_name .. '")] = {' .. ln)
 
 			local frame_attr_tbl = {}
 			for	frame_idx, frame in pairs(anim) do
-				if (type(frame) == "table" and not (
-					type(frame_idx) == "number" and 
-					anim[frame_idx-1] and 
-					not (frame.hitbox_data and next(frame.hitbox_data)) and
-					tbl_utils:deepcompare(frame, anim[frame_idx-1], true, {"hitbox_data"})
-				) and not tbl_utils:is_empty(frame)) then 
+				if (type(frame) == "table" and not tbl_utils:is_empty(frame)) then 
 					luatbl:write(lt .. "[" .. tostring(frame_idx) .. "] = {" .. ln)
-					print( #next(frame))
-					
 					for name, attr in pairs(frame) do
-						if name == "hitbox_data" and next(frame[name]) ~= nil then
-							luatbl:write(lt .. lt .. "hitbox_data = {" .. ln)
-							for idx, hitbox in ipairs(frame.hitbox_data) do
-								luatbl:write(lt .. lt .. lt .. "{")
-								for _name, data in pairs(hitbox) do
-									if data~=0 and data then
-										if _name == "hitbox_type" then
-											data = const.HITBOX_TYPE_IDX[data]
-										end
-										
-										luatbl:write(_name .. "=" .. tostring(data) .. ",")
-									end
-								end
-								luatbl:write("}," .. ln)
-							end
-							luatbl:write(lt .. lt .. "}," .. ln)
-						elseif type(frame_idx) == "number" and type(attr) ~= "table" then
-							if frame_attr_tbl[name] then
-								if frame_attr_tbl[name] ~= attr then
+						local continue = false
+						
+						if frame_attr_tbl[name] then
+							if type(attr) == "table" then
+								if not tbl_utils:deepcompare(frame_attr_tbl[name], attr) then
 									frame_attr_tbl[name] = attr
-									luatbl:write(lt .. lt .. name .. " = " .. attr .. "," .. ln)
+									continue = true
 								end
 							else
-								frame_attr_tbl[name] = attr
+								if frame_attr_tbl[name] ~= attr then
+									frame_attr_tbl[name] = attr
+									continue = true
+								end
+							end
+						else
+							frame_attr_tbl[name] = attr
+							continue = true
+						end
+
+						if continue then
+							if name == "hitbox_data" and next(frame[name]) ~= nil then
+								luatbl:write(lt .. lt .. "hitbox_data = {" .. ln)
+								for idx, hitbox in ipairs(frame.hitbox_data) do
+									luatbl:write(lt .. lt .. lt .. "{")
+									for _name, data in pairs(hitbox) do
+										if data~=0 and data then
+											if _name == "hitbox_type" then
+												data = const.HITBOX_TYPE_IDX[data]
+											end
+											
+											luatbl:write(_name .. "=" .. tostring(data) .. ",")
+										end
+									end
+									luatbl:write("}," .. ln)
+								end
+								luatbl:write(lt .. lt .. "}," .. ln)
+							elseif type(frame_idx) == "number" and type(attr) ~= "table" then
 								luatbl:write(lt .. lt .. name .. " = " .. attr .. "," .. ln)
 							end
 						end

@@ -2,27 +2,11 @@
   :code {
     :find {
       :replacement ""
-      :term "set_size"
+      :term "].attrs["
     }
   }
   :workflow {
     :recent-files [
-      [
-        "/README.md"
-        :code
-      ]
-      [
-        "/data/empty.atlas"
-        :scene
-      ]
-      [
-        "/data/arrow.atlas"
-        :scene
-      ]
-      [
-        "/data/grid.atlas"
-        :scene
-      ]
       [
         "/main/utils/node_repeat/material/gui_repeat.vp"
         :code
@@ -88,15 +72,7 @@
         :code
       ]
       [
-        "/main/ui/script/icon_buttons.lua"
-        :code
-      ]
-      [
         "/main/ui/script/prefabs/icon_button_prefabs.lua"
-        :code
-      ]
-      [
-        "/main/ui/script/frame_display.lua"
         :code
       ]
       [
@@ -104,7 +80,39 @@
         :code
       ]
       [
-        "/main/ui/script/file_load.lua"
+        "/main/ui/script/resize_buttons.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/hitbox.lua"
+        :code
+      ]
+      [
+        "/data/frame_btn/btn_bg.atlas"
+        :scene
+      ]
+      [
+        "/data/frame_btn/hitbox_bg.atlas"
+        :scene
+      ]
+      [
+        "/data/frame_btn/attr_bg.atlas"
+        :scene
+      ]
+      [
+        "/data/frame_btn/pencil_bg.atlas"
+        :scene
+      ]
+      [
+        "/main/ui/script/icon_buttons.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/frame_display.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/attr_table.lua"
         :code
       ]
       [
@@ -112,7 +120,11 @@
         :code
       ]
       [
-        "/main/ui/script/attr_table.lua"
+        "/main/ui/ui.gui"
+        :scene
+      ]
+      [
+        "/main/ui/script/file_load.lua"
         :code
       ]
       [
@@ -121,18 +133,6 @@
       ]
       [
         "/main/ui/script/anim.gui_script"
-        :code
-      ]
-      [
-        "/main/ui/ui.gui"
-        :scene
-      ]
-      [
-        "/main/ui/script/resize_buttons.lua"
-        :code
-      ]
-      [
-        "/main/ui/script/hitbox.lua"
         :code
       ]
     ]

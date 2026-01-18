@@ -1,0 +1,4 @@
+images {
+  image: "/data/frame_btn/attr_bg.png"
+}
+extrude_borders: 2

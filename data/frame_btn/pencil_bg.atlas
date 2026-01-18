@@ -1,0 +1,4 @@
+images {
+  image: "/data/frame_btn/pencil_bg.png"
+}
+extrude_borders: 2

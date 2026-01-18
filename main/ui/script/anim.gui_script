@@ -106,7 +106,7 @@ function init(self)
 	self.druid = druid.new(self)
 	
 	file_load:init(self.druid)
-	anim_sel:init(self.druid, file_load.atlas, hitboxes)
+	anim_sel:init(self.druid, file_load.atlas)
 	frame_display:init(self.druid)
 
 	icon_buttons:init(self.druid)
@@ -140,6 +140,8 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
+	print(message_id)
+	
 	if active ~= nil then
 		active:on_message(message_id, message, sender)
 	end
@@ -156,7 +158,7 @@ function on_message(self, message_id, message, sender)
 	if message_id == hash("file_loaded") then
 		anim_sel.atlas = file_load.atlas
 		anim_sel:set_nodes()
-		anim_sel:set_anim(next(file_load.atlas))
+		anim_sel:set_anim(next(file_load.atlas), hitboxes)
 
 		if next(attr_tables.anim.attrs) == nil then
 			attr_tables.anim:init_attrs("anim")
@@ -184,11 +186,31 @@ function on_message(self, message_id, message, sender)
 		local frame = frame_display.idx
 
 		if message.type == "frame" then
-			hitboxes[anim][frame].attrs[message.name] = message.value
+			local defaults = tbl_utils:return_defaults(hitboxes[anim], frame, "attrs", tbl_utils.len(attr_tables.frame.attrs))
+			
+			if defaults[message.name] ~= message.value then
+				hitboxes[anim][frame].attrs[message.name] = message.value
+				anim_sel:update_bg(frame, {attr=true})
+			else
+				if frame ~= 1 then
+					local changes_attr = false
+					for k, v in pairs(hitboxes[anim][frame].attrs) do
+						if tostring(v) ~= tostring(defaults[k]) then
+							changes_attr = true
+						end
+					end
+					if changes_attr then
+						anim_sel:update_bg(frame, {attr=false})
+					end
+				end
+				hitboxes[anim][frame].attrs[message.name] = nil
+			end
+					
 			if input_mod then 
 				for idx, _ in ipairs(hitboxes[anim]) do
 					if idx > frame then
 						hitboxes[anim][idx].attrs[message.name] = message.value
+						anim_sel:update_bg(idx, {attr=true})
 					end
 				end
 			end
@@ -275,7 +297,7 @@ function on_message(self, message_id, message, sender)
 									
 									hitboxes[anim_str][frame_idx][idx] = hitbox.new({
 										druid=self.druid,
-										pos=vmath.vector3(data.x_offset, data.y_offset, 0),
+										pos=vmath.vector3(data.x_offset or 0, data.y_offset or 0, 0),
 										bounds=vmath.vector3(data.width, data.height, 0),
 										attrs={
 											hitbox_type=data.hitbox_type or "hurtbox",
@@ -303,24 +325,19 @@ function on_message(self, message_id, message, sender)
 						hitboxes[anim_str].attrs[frame_idx] = frame
 					end
 				end
-
-				for idx, _ in ipairs(anim_sel.atlas[anim_str].spr) do
-					if not hitboxes[anim_str][idx] or next(hitboxes[anim_str][idx]) == nil then
-						hitboxes[anim_str][idx] = {}
-						hitboxes[anim_str][idx].attrs = {}
-					end
-				end
 			end
 		end
 
+		create_hitboxes_table()
+		
 		attr_tables.anim:update_attrs(hitboxes[_anim].attrs)
 		attr_tables.frame:update_attrs(hitboxes[_anim][_frame].attrs)
 
-		create_hitboxes_table()
 		reset_active()
 		update_hitboxes(hitboxes[_anim][_frame])		
 		update_zoom(frame_display.zoom)
-		
+
+		anim_sel:set_anim(_anim, hitboxes)
 		anim_sel:update_colors(hitboxes[_anim])
 	end
 	
@@ -368,7 +385,7 @@ function on_message(self, message_id, message, sender)
 		local anim = anim_sel.selected
 		local frame = frame_display.idx
 
-		anim_sel:set_anim(message.name)
+		anim_sel:set_anim(message.name, hitboxes)
 		if next(hitboxes[anim].attrs) ~= nil then
 			attr_tables.anim:set_attrs(hitboxes[anim].attrs)
 		end
@@ -396,24 +413,19 @@ function on_message(self, message_id, message, sender)
 
 		frame_display:display_frame(file_load.atlas, anim_sel.selected, message.idx)
 
-		if next(hitboxes[anim][frame].attrs) ~= nil then
-			attr_tables.frame:set_attrs(hitboxes[anim][frame].attrs)
-		end
-
-		local default
-
-		for i=message.idx-1, 1, -1 do
-			if hitboxes[anim][i] and hitboxes[anim][i].attrs then
-				default = hitboxes[anim][i].attrs
-				break
+		if not message.ignore_set_attr then
+			if next(hitboxes[anim][frame].attrs) ~= nil then
+				attr_tables.frame:set_attrs(hitboxes[anim][frame].attrs)
 			end
 		end
+ 
+		local defaults = tbl_utils:return_defaults(hitboxes[anim], message.idx, "attrs", tbl_utils.len(attr_tables.frame.attrs))
 		
-		attr_tables.frame:update_attrs(hitboxes[anim][message.idx].attrs, default)
+		attr_tables.frame:update_attrs(hitboxes[anim][message.idx].attrs, defaults)
 		
 		if frame == message.idx then return end
 
-		if active ~= nil then attr_tables.hitbox:set_attrs(active.attrs) end
+		if active ~= nil and not message.ignore_set_attr then attr_tables.hitbox:set_attrs(active.attrs) end
 		
 		update_hitboxes(hitboxes[anim][message.idx], hitboxes[anim][frame])
 		update_zoom(frame_display.zoom)
@@ -515,6 +527,10 @@ function on_input(self, action_id, action)
 			if not hitboxes[anim][frame].attrs.state then
 				msg.post(".", "update_attr", {type="frame", name="state", value=attr_tables.frame.attrs.state.input.get_value()})
 			end
+			
+			if tbl_utils.len(hitboxes[anim][frame]) == 2 then -- must be because this is the first added hitbox
+				anim_sel:update_bg(frame, {hitbox=true})
+			end
 		end
 
 		if action_id == hash("remove_hitbox") and action.pressed then
@@ -526,6 +542,10 @@ function on_input(self, action_id, action)
 			table.remove(hitboxes[anim][frame], active.idx)
 			
 			active = active:delete(true)
+
+			if tbl_utils.len(hitboxes[anim][frame]) == 1 then -- must be because this is the first added hitbox
+				anim_sel:update_bg(frame, {hitbox=false})
+			end
 		end
 
 		if string.find(tostring(action_id), "key") then

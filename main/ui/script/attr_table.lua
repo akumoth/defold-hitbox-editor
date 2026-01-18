@@ -20,6 +20,7 @@ function attr_table.new(druid, prefix)
 	data.scroll:set_horizontal_scroll(false)
 
 	data.attrs = {}
+	
 	data.attr_nodes = {}
 	
 	local self = setmetatable(data, attr_table)
@@ -440,12 +441,17 @@ end
 
 function attr_table:set_attrs(attrs)
 	for name, value in pairs(self.attrs) do
-		attrs[name] = self.attrs[name].input.get_value()
+		if attrs[name] then
+			attrs[name] = self.attrs[name].input.get_value()
+		end
 	end
 end
 
 function attr_table:update_attrs(attrs, default)
-	if next(attrs) == nil and default == nil then
+	if next(attrs) == nil then attrs = nil end
+	if type(default) == "table" and next(default) == nil then default = nil end
+	
+	if attrs == nil and default == nil then
 		for name, value in pairs(self.attrs) do
 			self.attrs[name].input.set_value(self.attrs[name].default)
 		end

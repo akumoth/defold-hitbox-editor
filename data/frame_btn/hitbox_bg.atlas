@@ -1,0 +1,4 @@
+images {
+  image: "/data/frame_btn/hitbox_bg.png"
+}
+extrude_borders: 2

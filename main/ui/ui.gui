@@ -35,6 +35,18 @@ textures {
   name: "enemybutton"
   texture: "/data/enemybutton.atlas"
 }
+textures {
+  name: "attr_bg"
+  texture: "/data/frame_btn/attr_bg.atlas"
+}
+textures {
+  name: "hitbox_bg"
+  texture: "/data/frame_btn/hitbox_bg.atlas"
+}
+textures {
+  name: "pencil_bg"
+  texture: "/data/frame_btn/pencil_bg.atlas"
+}
 nodes {
   position {
     x: 480.0
@@ -498,6 +510,33 @@ nodes {
   parent: "frame_idx_but"
   inherit_alpha: true
   size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  type: TYPE_BOX
+  texture: "attr_bg/attr_bg"
+  id: "frame_idx_attr_bg"
+  parent: "frame_idx_but"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  type: TYPE_BOX
+  texture: "hitbox_bg/hitbox_bg"
+  id: "frame_idx_hitbox_bg"
+  parent: "frame_idx_but"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  type: TYPE_BOX
+  texture: "pencil_bg/pencil_bg"
+  id: "frame_idx_pencil_bg"
+  parent: "frame_idx_but"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
 }
 nodes {
   scale {
