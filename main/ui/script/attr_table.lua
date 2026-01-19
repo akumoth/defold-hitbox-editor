@@ -22,6 +22,8 @@ function attr_table.new(druid, prefix)
 	data.attrs = {}
 	
 	data.attr_nodes = {}
+
+	data.defaults = {}
 	
 	local self = setmetatable(data, attr_table)
 	self._index = self
@@ -224,6 +226,14 @@ function attr_table:create_attr(attr)
 	self.view:add(root)
 end
 
+function attr_table:get_attr_defaults()
+	local defaults = {}
+	for k, v in pairs(self.attrs) do
+		defaults[k] = self.attrs[k].default
+	end
+	return defaults
+end
+
 function attr_table:init_attrs(attr_type)
 	gui.set_enabled(self.root, true)
 
@@ -358,6 +368,14 @@ function attr_table:init_attrs(attr_type)
 				end
 			})
 			self:create_attr({
+				name="clear_hitboxes",
+				type="bool",
+				content=false,
+				callback = function (value)
+					msg.post(".", "update_attr", {type="frame", name="clear_hitboxes", value=value})
+				end
+			})
+			self:create_attr({
 				name="cancel_land",
 				type="bool",
 				content=false,
@@ -389,6 +407,14 @@ function attr_table:init_attrs(attr_type)
 				allowed="[%-?%d+]",
 				callback = function (value)
 					msg.post(".", "update_attr", {type="frame", name="add_speed_y", value=value})
+				end
+			})
+			self:create_attr({
+				name="hold_speed",
+				type="bool",
+				content=false,
+				callback = function (value)
+					msg.post(".", "update_attr", {type="frame", name="hold_speed", value=value})
 				end
 			})
 		end
@@ -437,6 +463,7 @@ function attr_table:init_attrs(attr_type)
 		end
 	end
 
+	self.defaults = self:get_attr_defaults()
 end
 
 function attr_table:set_attrs(attrs, only_overwrite)
@@ -451,27 +478,21 @@ function attr_table:update_attrs(attrs, default)
 	if next(attrs) == nil then attrs = nil end
 	if type(default) == "table" and next(default) == nil then default = nil end
 	
-	if attrs == nil and default == nil then
-		for name, value in pairs(self.attrs) do
-			self.attrs[name].input.set_value(self.attrs[name].default)
-		end
-	else
-		local displayed_attrs = {}
+	local displayed_attrs = {}
 
-		if default ~= nil then
-			for k in pairs(self.attrs) do
-				if attrs and attrs[k] ~= nil then
-					displayed_attrs[k] = attrs[k]
-				else
-					displayed_attrs[k] = default[k]
-				end
-			end
-		else displayed_attrs = attrs end
-		
-		for name, value in pairs(displayed_attrs) do
-			if self.attrs[name] then
-				self.attrs[name].input.set_value(value)
-			end
+	for k in pairs(self.attrs) do
+		if attrs and attrs[k] ~= nil then
+			displayed_attrs[k] = attrs[k]
+		elseif default and default[k] ~= nil then
+			displayed_attrs[k] = default[k]
+		else
+			displayed_attrs[k] = self.defaults[k]
+		end
+	end
+	
+	for name, value in pairs(displayed_attrs) do
+		if self.attrs[name] then
+			self.attrs[name].input.set_value(value)
 		end
 	end
 end

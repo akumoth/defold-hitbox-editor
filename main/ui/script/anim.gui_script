@@ -140,8 +140,6 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
-	print(message_id)
-	
 	if active ~= nil then
 		active:on_message(message_id, message, sender)
 	end
@@ -187,11 +185,17 @@ function on_message(self, message_id, message, sender)
 
 		if message.type == "frame" then
 			local defaults = tbl_utils:return_defaults(hitboxes[anim], frame, "attrs", tbl_utils.len(attr_tables.frame.attrs))
+			for k, v in pairs(attr_tables.frame.defaults) do
+				if defaults[k] == nil then
+					defaults[k] = v
+				end
+			end
 			
 			if defaults[message.name] ~= message.value then
 				hitboxes[anim][frame].attrs[message.name] = message.value
 				anim_sel:update_bg(frame, {attr=true})
 			else
+				hitboxes[anim][frame].attrs[message.name] = nil
 				local change_bg = true
 				for k, v in pairs(defaults) do
 					if hitboxes[anim][frame].attrs[k] ~= nil and hitboxes[anim][frame].attrs[k] ~= defaults[k] then
@@ -199,18 +203,9 @@ function on_message(self, message_id, message, sender)
 					end
 				end
 				
-				if frame ~= 1 and change_bg then	
-					local changes_attr = false
-					for k, v in pairs(hitboxes[anim][frame].attrs) do
-						if tostring(v) ~= tostring(defaults[k]) then
-							changes_attr = true
-						end
-					end
-					if changes_attr then
-						anim_sel:update_bg(frame, {attr=false})
-					end
+				if frame ~= 1 and change_bg then
+					anim_sel:update_bg(frame, {attr=false})
 				end
-				hitboxes[anim][frame].attrs[message.name] = nil
 			end
 					
 			if input_mod then 
@@ -553,7 +548,7 @@ function on_input(self, action_id, action)
 			if not tbl_utils:is_empty(hitboxes[anim][frame]) then
 				for k, v in pairs(hitboxes[anim][frame]) do
 					if k ~= "attrs" then
-						v.idx = v.idx - 1
+						v.idx = k
 					end
 				end
 			end

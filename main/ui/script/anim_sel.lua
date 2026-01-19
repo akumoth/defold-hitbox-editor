@@ -30,7 +30,7 @@ function anim_sel:set_anim(name, hitboxes)
 		-- filter depending on frame state (always have at least 1 frame to avoid editor borking)
 		if idx ~= 1 then
 			if self.frame_view_state == 2 or self.frame_view_state == 4 then
-				if hitboxes[name] and hitboxes[name][idx] then
+				if hitboxes[name] and hitboxes[name][idx] ~= nil then
 					if not tbl_utils:is_empty(hitboxes[name][idx]) then
 						continue = true
 					end
