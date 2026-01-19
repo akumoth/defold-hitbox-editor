@@ -439,9 +439,9 @@ function attr_table:init_attrs(attr_type)
 
 end
 
-function attr_table:set_attrs(attrs)
+function attr_table:set_attrs(attrs, only_overwrite)
 	for name, value in pairs(self.attrs) do
-		if attrs[name] then
+		if not (only_overwrite and attrs[name] == nil) then
 			attrs[name] = self.attrs[name].input.get_value()
 		end
 	end
@@ -456,7 +456,19 @@ function attr_table:update_attrs(attrs, default)
 			self.attrs[name].input.set_value(self.attrs[name].default)
 		end
 	else
-		for name, value in pairs(attrs or default) do
+		local displayed_attrs = {}
+
+		if default ~= nil then
+			for k in pairs(self.attrs) do
+				if attrs and attrs[k] ~= nil then
+					displayed_attrs[k] = attrs[k]
+				else
+					displayed_attrs[k] = default[k]
+				end
+			end
+		else displayed_attrs = attrs end
+		
+		for name, value in pairs(displayed_attrs) do
 			if self.attrs[name] then
 				self.attrs[name].input.set_value(value)
 			end

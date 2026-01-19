@@ -2,7 +2,7 @@
   :code {
     :find {
       :replacement ""
-      :term "].attrs["
+      :term "set_active"
     }
   }
   :workflow {
@@ -84,10 +84,6 @@
         :code
       ]
       [
-        "/main/ui/script/hitbox.lua"
-        :code
-      ]
-      [
         "/data/frame_btn/btn_bg.atlas"
         :scene
       ]
@@ -112,16 +108,12 @@
         :code
       ]
       [
-        "/main/ui/script/attr_table.lua"
-        :code
+        "/main/ui/ui.gui"
+        :scene
       ]
       [
         "/main/utils/table_utils.lua"
         :code
-      ]
-      [
-        "/main/ui/ui.gui"
-        :scene
       ]
       [
         "/main/ui/script/file_load.lua"
@@ -129,6 +121,14 @@
       ]
       [
         "/main/ui/script/anim_sel.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/attr_table.lua"
+        :code
+      ]
+      [
+        "/main/ui/script/hitbox.lua"
         :code
       ]
       [
